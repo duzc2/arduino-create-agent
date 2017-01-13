@@ -82,7 +82,7 @@ func uploadHandler(c *gin.Context) {
 		log.Error("board is required")
 		return
 	}
-
+/*
 	if data.Extra.Network == false {
 		if data.Signature == "" {
 			c.String(http.StatusBadRequest, "signature is required")
@@ -101,7 +101,7 @@ func uploadHandler(c *gin.Context) {
 			return
 		}
 	}
-
+*/
 	buffer := bytes.NewBuffer(data.Hex)
 
 	filePath, err := utilities.SaveFileonTempDir(data.Filename, buffer)

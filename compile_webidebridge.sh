@@ -77,7 +77,7 @@ compilePlatform()
 	fi
 	echo createZipEmbeddableFileArduino $GOOS $GOARCH $NAME
 	createZipEmbeddableFileArduino $GOOS $GOARCH $NAME
-	GOOS=$GOOS GOARCH=$GOARCH go-selfupdate $NAME $VERSION
+	GOOS=$GOOS GOARCH=$GOARCH ./go-selfupdate $NAME $VERSION
 	rm -rf $NAME*
 }
 
@@ -87,9 +87,9 @@ rm -rf snapshot/darwin_amd64
 rm -rf snapshot/windows_386
 
 extractVersionFromMain
-compilePlatform darwin amd64 o64-clang 1
+#compilePlatform darwin amd64 o64-clang 1
 #compilePlatformLinux linux 386 gcc
-compilePlatform linux amd64 gcc 1
+#compilePlatform linux amd64 gcc 1
 #compilePlatform linux arm 0
 compilePlatform windows 386 i686-w64-mingw32-gcc 1
 

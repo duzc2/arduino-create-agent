@@ -127,7 +127,7 @@ func main() {
 				if err != nil {
 					panic(err)
 				}
-				_, err = f.WriteString("\norigins = http://webide.arduino.cc:8080\n")
+				_, err = f.WriteString("\norigins = *\n")
 				if err != nil {
 					panic(err)
 				}
@@ -283,8 +283,8 @@ const homeTemplateHtml = `<!DOCTYPE html>
 <html>
 <head>
 <title>Serial Port Example</title>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
 <script type="text/javascript">
     $(function() {
 
