@@ -7,7 +7,7 @@
 #go install github.com/sanbornm/go-selfupdate
 
 VERSION=xxx
-APP_NAME=Arduino_Create_Bridge
+APP_NAME=agent
 
 # OUTPUT-COLORING
 red='\e[0;31m'
@@ -80,11 +80,12 @@ compilePlatform()
 	GOOS=$GOOS GOARCH=$GOARCH ./go-selfupdate $NAME $VERSION
 	rm -rf $NAME*
 }
-
 rm -rf snapshot/linux_amd64
 rm -rf snapshot/linux_arm
 rm -rf snapshot/darwin_amd64
 rm -rf snapshot/windows_386
+
+cp ./iconwin.go_nuoding ./src/github.com/facchinm/systray/example/icon/iconwin.go
 
 extractVersionFromMain
 #compilePlatform darwin amd64 o64-clang 1

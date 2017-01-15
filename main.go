@@ -43,7 +43,7 @@ var (
 	port         string
 	portSSL      string
 	origins      = flag.String("origins", "", "Allowed origin list for CORS")
-	address      = flag.String("address", "127.0.0.1", "The address where to listen. Defaults to localhost")
+	address      = flag.String("address", "0.0.0.0", "The address where to listen. Defaults to localhost")
 	signatureKey = flag.String("signatureKey", "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvc0yZr1yUSen7qmE3cxF\nIE12rCksDnqR+Hp7o0nGi9123eCSFcJ7CkIRC8F+8JMhgI3zNqn4cUEn47I3RKD1\nZChPUCMiJCvbLbloxfdJrUi7gcSgUXrlKQStOKF5Iz7xv1M4XOP3JtjXLGo3EnJ1\npFgdWTOyoSrA8/w1rck4c/ISXZSinVAggPxmLwVEAAln6Itj6giIZHKvA2fL2o8z\nCeK057Lu8X6u2CG8tRWSQzVoKIQw/PKK6CNXCAy8vo4EkXudRutnEYHEJlPkVgPn\n2qP06GI+I+9zKE37iqj0k1/wFaCVXHXIvn06YrmjQw6I0dDj/60Wvi500FuRVpn9\ntwIDAQAB\n-----END PUBLIC KEY-----", "Pem-encoded public key to verify signed commandlines")
 	Tools        tools.Tools
 	indexURL     = flag.String("indexURL", "https://downloads.arduino.cc/packages/package_staging_index.json", "The address from where to download the index json containing the location of upload tools")
@@ -202,7 +202,7 @@ func main() {
 
 			extraOriginStr := "https://create.arduino.cc, http://create.arduino.cc, https://create-dev.arduino.cc, http://create-dev.arduino.cc"
 
-			for i := 8990; i < 9001; i++ {
+			for i := 18990; i < 19001; i++ {
 				extraOriginStr = extraOriginStr + ", http://localhost:" + strconv.Itoa(i) + ", https://localhost:" + strconv.Itoa(i)
 			}
 
@@ -237,8 +237,8 @@ func main() {
 					return
 				}
 
-				start := 8990
-				end := 9000
+				start := 18990
+				end := 19000
 				i := start
 				for i < end {
 					i = i + 1
@@ -254,8 +254,8 @@ func main() {
 			}()
 
 			go func() {
-				start := 8990
-				end := 9000
+				start := 18990
+				end := 19000
 				i := start
 				for i < end {
 					i = i + 1
