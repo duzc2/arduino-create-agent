@@ -6,3 +6,7 @@ serial-port-json-server
 snapshot/*
 public/
 artifacts*
+src/*
+pkg/*
+arduino/*
+bin/*
