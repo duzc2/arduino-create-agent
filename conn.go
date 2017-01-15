@@ -102,6 +102,11 @@ func uploadHandler(c *gin.Context) {
 		}
 	}
 */
+
+    if data.Commandline == "" {
+        c.String(http.StatusBadRequest, "commandline is required for local board")
+        return
+    }
 	buffer := bytes.NewBuffer(data.Hex)
 
 	filePath, err := utilities.SaveFileonTempDir(data.Filename, buffer)

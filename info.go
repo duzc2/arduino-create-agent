@@ -12,6 +12,7 @@ func infoHandler(c *gin.Context) {
 		"https":   "https://localhost" + portSSL,
 		"ws":      "ws://localhost" + port,
 		"wss":     "wss://localhost" + portSSL,
+        "company": "nuoding",
 	})
 }
 
