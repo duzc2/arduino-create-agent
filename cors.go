@@ -151,11 +151,13 @@ func corsMiddleware(config corsConfig) gin.HandlerFunc {
 			if !preflight {
 				/*valid =*/ handleRequest(context, config)
             }else{
-                context.Writer.Header().Set(AllowOriginKey, "*")
+                context.Writer.Header().Set(AllowOriginKey, currentOrigin)
                 context.AbortWithStatus(200)
+                return;
             }
 
-			context.Writer.Header().Set(AllowOriginKey, "*")
+            context.Writer.Header().Set(AllowCredentialsKey, "true")
+			context.Writer.Header().Set(AllowOriginKey, currentOrigin)
             return;
             /*
 			if valid {
