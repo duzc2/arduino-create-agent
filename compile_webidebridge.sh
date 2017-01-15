@@ -90,7 +90,7 @@ cp ./iconwin.go_nuoding ./src/github.com/facchinm/systray/example/icon/iconwin.g
 extractVersionFromMain
 #compilePlatform darwin amd64 o64-clang 1
 #compilePlatformLinux linux 386 gcc
-#compilePlatform linux amd64 gcc 1
+compilePlatform linux amd64 gcc 1
 #compilePlatform linux arm 0
 compilePlatform windows 386 i686-w64-mingw32-gcc 1
 

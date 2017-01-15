@@ -6,7 +6,8 @@ package main
 import (
 	"flag"
 	"os"
-	"os/user"
+	//"os/user"
+	"os/exec"
 	"path/filepath"
 	"runtime/debug"
 	"strconv"
@@ -17,7 +18,6 @@ import (
 	"github.com/arduino/arduino-create-agent/tools"
 	"github.com/arduino/arduino-create-agent/utilities"
 	"github.com/gin-gonic/gin"
-	"github.com/itsjamie/gin-cors"
 	"github.com/kardianos/osext"
 	"github.com/vharitonsky/iniflags"
 	//"github.com/sanbornm/go-selfupdate/selfupdate" #included in update.go to change heavily
@@ -36,17 +36,18 @@ var (
 	gcType       = flag.String("gc", "std", "Type of garbage collection. std = Normal garbage collection allowing system to decide (this has been known to cause a stop the world in the middle of a CNC job which can cause lost responses from the CNC controller and thus stalled jobs. use max instead to solve.), off = let memory grow unbounded (you have to send in the gc command manually to garbage collect or you will run out of RAM eventually), max = Force garbage collection on each recv or send on a serial port (this minimizes stop the world events and thus lost serial responses, but increases CPU usage)")
 	logDump      = flag.String("log", "off", "off = (default)")
 	// hostname. allow user to override, otherwise we look it up
-	hostname     = flag.String("hostname", "unknown-hostname", "Override the hostname we get from the OS")
-	updateUrl    = flag.String("updateUrl", "", "")
-	appName      = flag.String("appName", "", "")
-	genCert      = flag.Bool("generateCert", false, "")
-	port         string
-	portSSL      string
-	origins      = flag.String("origins", "", "Allowed origin list for CORS")
-	address      = flag.String("address", "0.0.0.0", "The address where to listen. Defaults to localhost")
-	signatureKey = flag.String("signatureKey", "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvc0yZr1yUSen7qmE3cxF\nIE12rCksDnqR+Hp7o0nGi9123eCSFcJ7CkIRC8F+8JMhgI3zNqn4cUEn47I3RKD1\nZChPUCMiJCvbLbloxfdJrUi7gcSgUXrlKQStOKF5Iz7xv1M4XOP3JtjXLGo3EnJ1\npFgdWTOyoSrA8/w1rck4c/ISXZSinVAggPxmLwVEAAln6Itj6giIZHKvA2fL2o8z\nCeK057Lu8X6u2CG8tRWSQzVoKIQw/PKK6CNXCAy8vo4EkXudRutnEYHEJlPkVgPn\n2qP06GI+I+9zKE37iqj0k1/wFaCVXHXIvn06YrmjQw6I0dDj/60Wvi500FuRVpn9\ntwIDAQAB\n-----END PUBLIC KEY-----", "Pem-encoded public key to verify signed commandlines")
-	Tools        tools.Tools
-	indexURL     = flag.String("indexURL", "https://downloads.arduino.cc/packages/package_staging_index.json", "The address from where to download the index json containing the location of upload tools")
+	hostname       = flag.String("hostname", "unknown-hostname", "Override the hostname we get from the OS")
+	updateUrl      = flag.String("updateUrl", "", "")
+	appName        = flag.String("appName", "", "")
+	genCert        = flag.Bool("generateCert", false, "")
+	port           string
+	portSSL        string
+	origins        = flag.String("origins", "*", "Allowed origin list for CORS")
+	address        = flag.String("address", "0.0.0.0", "The address where to listen. Defaults to localhost")
+	requestAddress = flag.String("requestAddress", "localhost", "Where should the request send to")
+	signatureKey   = flag.String("signatureKey", "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvc0yZr1yUSen7qmE3cxF\nIE12rCksDnqR+Hp7o0nGi9123eCSFcJ7CkIRC8F+8JMhgI3zNqn4cUEn47I3RKD1\nZChPUCMiJCvbLbloxfdJrUi7gcSgUXrlKQStOKF5Iz7xv1M4XOP3JtjXLGo3EnJ1\npFgdWTOyoSrA8/w1rck4c/ISXZSinVAggPxmLwVEAAln6Itj6giIZHKvA2fL2o8z\nCeK057Lu8X6u2CG8tRWSQzVoKIQw/PKK6CNXCAy8vo4EkXudRutnEYHEJlPkVgPn\n2qP06GI+I+9zKE37iqj0k1/wFaCVXHXIvn06YrmjQw6I0dDj/60Wvi500FuRVpn9\ntwIDAQAB\n-----END PUBLIC KEY-----", "Pem-encoded public key to verify signed commandlines")
+	Tools          tools.Tools
+	indexURL       = flag.String("indexURL", "https://downloads.arduino.cc/packages/package_staging_index.json", "The address from where to download the index json containing the location of upload tools")
 )
 
 type NullWriter int
@@ -90,8 +91,16 @@ func main() {
 			dest := filepath.Dir(src)
 
 			// Instantiate Tools
-			usr, _ := user.Current()
-			directory := filepath.Join(usr.HomeDir, ".arduino-create")
+			//usr, _ := user.Current()
+			//directory := filepath.Join(usr.HomeDir, ".arduino-create")
+
+			file, _ := exec.LookPath(os.Args[0])
+			path, _ := filepath.Abs(file)
+			path = filepath.Dir(path)
+			println("toolsFilePath:")
+			println(path)
+			directory := filepath.Join(path, "tools")
+
 			Tools = tools.Tools{
 				Directory: directory,
 				IndexURL:  *indexURL,
@@ -202,20 +211,20 @@ func main() {
 
 			extraOriginStr := "https://create.arduino.cc, http://create.arduino.cc, https://create-dev.arduino.cc, http://create-dev.arduino.cc"
 
-			for i := 18990; i < 19001; i++ {
+			for i := 8990; i < 9001; i++ {
 				extraOriginStr = extraOriginStr + ", http://localhost:" + strconv.Itoa(i) + ", https://localhost:" + strconv.Itoa(i)
 			}
-
-			r.Use(cors.Middleware(cors.Config{
-				Origins:         *origins + ", " + extraOriginStr,
-				Methods:         "GET, PUT, POST, DELETE",
-				RequestHeaders:  "Origin, Authorization, Content-Type",
-				ExposedHeaders:  "",
-				MaxAge:          50 * time.Second,
-				Credentials:     true,
-				ValidateHeaders: false,
-			}))
-
+			/*
+			*/
+				r.Use(corsMiddleware(corsConfig{
+					Origins:         *origins + ", " + extraOriginStr,
+					Methods:         "GET, PUT, POST, DELETE",
+					RequestHeaders:  "Origin, Authorization, Content-Type",
+					ExposedHeaders:  "",
+					MaxAge:          50 * time.Second,
+					Credentials:     false,
+					ValidateHeaders: false,
+				}))
 			r.LoadHTMLFiles("templates/nofirefox.html")
 
 			r.GET("/", homeHandler)
@@ -237,8 +246,8 @@ func main() {
 					return
 				}
 
-				start := 18990
-				end := 19000
+				start := 8990
+				end := 9000
 				i := start
 				for i < end {
 					i = i + 1
@@ -254,8 +263,8 @@ func main() {
 			}()
 
 			go func() {
-				start := 18990
-				end := 19000
+				start := 8990
+				end := 9000
 				i := start
 				for i < end {
 					i = i + 1
