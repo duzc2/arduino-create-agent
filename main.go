@@ -6,8 +6,8 @@ package main
 import (
 	"flag"
 	"os"
-	//"os/user"
-	"os/exec"
+	"os/user"
+	//"os/exec"
 	"path/filepath"
 	"runtime/debug"
 	"strconv"
