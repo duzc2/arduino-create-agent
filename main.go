@@ -91,16 +91,8 @@ func main() {
 			dest := filepath.Dir(src)
 
 			// Instantiate Tools
-			//usr, _ := user.Current()
-			//directory := filepath.Join(usr.HomeDir, ".arduino-create")
-
-			file, _ := exec.LookPath(os.Args[0])
-			path, _ := filepath.Abs(file)
-			path = filepath.Dir(path)
-			println("toolsFilePath:")
-			println(path)
-			directory := filepath.Join(path, "tools")
-
+			usr, _ := user.Current()
+			directory := filepath.Join(usr.HomeDir, ".arduino-create")
 			Tools = tools.Tools{
 				Directory: directory,
 				IndexURL:  *indexURL,
@@ -246,8 +238,8 @@ func main() {
 					return
 				}
 
-				start := 8990
-				end := 9000
+				start := 8995
+				end := 9010
 				i := start
 				for i < end {
 					i = i + 1
