@@ -126,7 +126,7 @@ func spProgramSSHNetwork(portname string, boardname string, filePath string, com
 	ssh_output, err := ssh_client.Exec(commandline)
 	if err == nil {
 		log.Printf("Flash: %s\n", ssh_output)
-		mapD := map[string]string{"ProgrammerStatus": "Busy", "Msg": string(ssh_output)}
+        mapD := map[string]string{"ProgrammerStatus": "Busy", "Msg": string(ssh_output),"Port":portname}
 		mapB, _ := json.Marshal(mapD)
 		h.broadcastSys <- mapB
 	}
@@ -193,7 +193,7 @@ func spProgramNetwork(portname string, boardname string, filePath string, authda
 
 	//h.broadcastSys <- []byte("Start flashing with command " + cmdString)
 	log.Printf("Network flashing on " + portname)
-	mapD := map[string]string{"ProgrammerStatus": "Starting", "Cmd": "POST"}
+	mapD := map[string]string{"ProgrammerStatus": "Starting", "Cmd": "POST","Port":portname}
 	mapB, _ := json.Marshal(mapD)
 	h.broadcastSys <- mapB
 
@@ -247,7 +247,7 @@ func spProgramLocal(portname string, boardname string, filePath string, commandl
 		location, err := Tools.GetLocation(element)
 		if err != nil {
 			log.Printf("Command finished with error: %v", err)
-			mapD := map[string]string{"ProgrammerStatus": "Error", "Msg": "Could not find the upload tool"}
+			mapD := map[string]string{"ProgrammerStatus": "Error", "Msg": "Could not find the upload tool","Port":portname}
 			mapB, _ := json.Marshal(mapD)
 			h.broadcastSys <- mapB
 		}
@@ -255,7 +255,7 @@ func spProgramLocal(portname string, boardname string, filePath string, commandl
 	}
 
 	z, _ := shellwords.Parse(commandline)
-	return spHandlerProgram(z[0], z[1:])
+	return spHandlerProgram(z[0], z[1:],portname)
 }
 
 func spProgramRW(portname string, boardname string, filePath string, commandline string, extraInfo boardExtraInfo) {
@@ -280,12 +280,12 @@ func spProgramRW(portname string, boardname string, filePath string, commandline
 
 	if err != nil {
 		log.Printf("Command finished with error: %v", err)
-		mapD := map[string]string{"ProgrammerStatus": "Error", "Msg": "Could not program the board"}
+		mapD := map[string]string{"ProgrammerStatus": "Error", "Msg": "Could not program the board","Port":portname}
 		mapB, _ := json.Marshal(mapD)
 		h.broadcastSys <- mapB
 	} else {
 		log.Printf("Finished without error. Good stuff")
-		mapD := map[string]string{"ProgrammerStatus": "Done", "Flash": "Ok"}
+		mapD := map[string]string{"ProgrammerStatus": "Done", "Flash": "Ok","Port":portname}
 		mapB, _ := json.Marshal(mapD)
 		h.broadcastSys <- mapB
 		// analyze stdin
@@ -294,7 +294,7 @@ func spProgramRW(portname string, boardname string, filePath string, commandline
 
 var oscmd *exec.Cmd
 
-func spHandlerProgram(flasher string, cmdString []string) error {
+func spHandlerProgram(flasher string, cmdString []string,portname string) error {
 	// if runtime.GOOS == "darwin" {
 	// 	sh, _ := exec.LookPath("sh")
 	// 	// prepend the flasher to run it via sh
@@ -335,7 +335,7 @@ func spHandlerProgram(flasher string, cmdString []string) error {
 
 	//h.broadcastSys <- []byte("Start flashing with command " + cmdString)
 	log.Printf("Flashing with command:" + flasher + extension + " " + strings.Join(cmdString, " "))
-	mapD := map[string]string{"ProgrammerStatus": "Starting", "Cmd": strings.Join(cmdString, " ")}
+	mapD := map[string]string{"ProgrammerStatus": "Starting", "Cmd": strings.Join(cmdString, " "),"Port":portname}
 	mapB, _ := json.Marshal(mapD)
 	h.broadcastSys <- mapB
 
@@ -350,7 +350,7 @@ func spHandlerProgram(flasher string, cmdString []string) error {
 	go func() {
 		for stdout_copy.Scan() {
 			log.Info(stdout_copy.Text())
-			mapD := map[string]string{"ProgrammerStatus": "Busy", "Msg": stdout_copy.Text()}
+			mapD := map[string]string{"ProgrammerStatus": "Busy", "Msg": stdout_copy.Text(),"Port":portname}
 			mapB, _ := json.Marshal(mapD)
 			h.broadcastSys <- mapB
 		}
@@ -359,7 +359,7 @@ func spHandlerProgram(flasher string, cmdString []string) error {
 	go func() {
 		for stderr_copy.Scan() {
 			log.Info(stderr_copy.Text())
-			mapD := map[string]string{"ProgrammerStatus": "Busy", "Msg": stderr_copy.Text()}
+			mapD := map[string]string{"ProgrammerStatus": "Busy", "Msg": stderr_copy.Text(),"Port":portname}
 			mapB, _ := json.Marshal(mapD)
 			h.broadcastSys <- mapB
 		}
