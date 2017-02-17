@@ -287,6 +287,7 @@ const homeTemplateHtml = `<!DOCTYPE html>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
 <script type="text/javascript">
+    var lengthLimit = 1000;
     $(function() {
 
     var socket;
@@ -300,7 +301,7 @@ const homeTemplateHtml = `<!DOCTYPE html>
 
 		if (!pause.checked && (only_log == false || (!(msg.indexOf("{") == 0) && !(msg.indexOf("list") == 0) && only_log == true))) {
 			messages.push(msg);
-			if (messages.length > 100) {
+			if (messages.length > lengthLimit) {
 				messages.shift();
 			}
 			var doScroll = log.scrollTop == log.scrollHeight - log.clientHeight;
