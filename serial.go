@@ -64,7 +64,7 @@ type qReport struct {
 	Type []string `json:"-"`
 	Ids  []string
 	D    []string //`json:"-"`
-	Port string
+	P string
 }
 
 type serialhub struct {
@@ -247,7 +247,7 @@ func write(wr writeRequest, id string) {
 		Ids:  idArr,
 		D:    cmds,
 		QCnt: wr.p.itemsInBuffer,
-		Port: wr.p.portConf.Name,
+		P: wr.p.portConf.Name,
 	}
 	json, _ := json.Marshal(qr)
 	h.broadcastSys <- json
