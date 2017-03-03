@@ -6,7 +6,7 @@ package main
 import (
 	"flag"
 	"os"
-	"os/user"
+	//"os/user"
 	//"os/exec"
 	"path/filepath"
 	"runtime/debug"
@@ -15,7 +15,8 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/arduino/arduino-create-agent/tools"
+	//"github.com/arduino/arduino-create-agent/tools"
+    "./tools"
 	"github.com/arduino/arduino-create-agent/utilities"
 	"github.com/gin-gonic/gin"
 	"github.com/kardianos/osext"
@@ -72,7 +73,11 @@ func launchSelfLater() {
 	time.Sleep(2 * 1000 * time.Millisecond)
 	log.Println("Done waiting 2 secs. Now launching...")
 }
-
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
 func main() {
 
 	flag.Parse()
@@ -81,6 +86,18 @@ func main() {
 		generateCertificates()
 		os.Exit(0)
 	}
+
+    //log.SetFormatter(&log.JSONFormatter{})
+
+    log.SetLevel(log.DebugLevel)
+
+    //f, err := os.OpenFile("log.txt",os.O_WRONLY,6777);
+    f, err := os.Create("log.txt");
+    if err != nil {
+        os.Exit(1)
+    }
+    //log.SetOutput(os.Stderr)
+    log.SetOutput(f)
 
 	if *hibernate == false {
 
@@ -91,12 +108,26 @@ func main() {
 			dest := filepath.Dir(src)
 
 			// Instantiate Tools
+            /*
+            filePath, _ := exec.LookPath(os.Args[0])
+            directory, _ := filepath.Split(filePath)
+            */
+            /*
 			usr, _ := user.Current()
 			directory := filepath.Join(usr.HomeDir, ".arduino-create")
+            */
+            /*
+            logger := &log.Logger{
+                Out: f,
+                Formatter: new(log.JSONFormatter),
+                Hooks: make(log.LevelHooks),
+                Level: log.DebugLevel,
+            }
+            */
 			Tools = tools.Tools{
-				Directory: directory,
+                Directory: dest+"/tools",// same as tools.dir()
 				IndexURL:  *indexURL,
-				Logger:    log.New(),
+                Logger:    log.New(),
 			}
 			Tools.Init()
 
@@ -135,12 +166,6 @@ func main() {
 				f.Close()
 				restart("")
 			}
-			//log.SetFormatter(&log.JSONFormatter{})
-
-			log.SetLevel(log.InfoLevel)
-
-			log.SetOutput(os.Stderr)
-
 			// see if we are supposed to wait 5 seconds
 			if *isLaunchSelf {
 				launchSelfLater()
@@ -285,9 +310,9 @@ const homeTemplateHtml = `<!DOCTYPE html>
 <head>
 <title>Serial Port Example</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.4.2.min.js"></script>
-<script type="text/javascript" src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+<script type="text/javascript" src="http://editor.makelouden.cc/third-party/socket.io.min.js"></script>
 <script type="text/javascript">
-    var lengthLimit = 1000;
+    var lengthLimit = 5000;
     $(function() {
 
     var socket;
@@ -387,7 +412,7 @@ body {
     <input type="submit" value="Send" />
     <input type="text" id="msg" size="64"/>
     <input name="pause" type="checkbox" value="pause" id="myCheck"/> Pause
-    <!--<input type="button" value="Install Certificate" onclick="window.open('http://localhost:8991/certificate.crt')" />-->
+    <input type="button" value="Install Certificate" onclick="window.open('http://localhost:8991/certificate.crt')" />
 </form>
 </form>
 </body>

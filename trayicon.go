@@ -34,7 +34,7 @@ import (
 	"runtime"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/facchinm/go-serial"
+	//"github.com/facchinm/go-serial"
 	"github.com/facchinm/systray"
 	"github.com/facchinm/systray/example/icon"
 	"github.com/skratchdot/open-golang/open"
@@ -67,11 +67,11 @@ func setupSysTrayReal() {
 	mUrl := systray.AddMenuItem("前往云平台", "云平台")
 	//mDebug := systray.AddMenuItem("Open debug console", "Debug console")
 	//menuVer := systray.AddMenuItem("版本号"+version+"-"+git_revision, "")
-	mPause := systray.AddMenuItem("暂停插件", "")
-	//mQuit := systray.AddMenuItem("Quit Plugin", "")
+
 
 	//menuVer.Disable()
-
+    /*
+	mPause := systray.AddMenuItem("暂停插件", "")
 	go func() {
 		<-mPause.ClickedCh
 		ports, _ := serial.GetPortsList()
@@ -83,12 +83,14 @@ func setupSysTrayReal() {
 		log.Println("Restart becayse setup went wrong?")
 		restart("")
 	}()
+    */
+	mQuit := systray.AddMenuItem("关闭插件", "")
+	go func() {
+		<-mQuit.ClickedCh
+		systray.Quit()
+		exit()
+	}()
 
-	// go func() {
-	// 	<-mQuit.ClickedCh
-	// 	systray.Quit()
-	// 	exit()
-	// }()
 /*
 	go func() {
 		for {

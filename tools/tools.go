@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"os/user"
+	//"os/user"
+	"github.com/kardianos/osext"
 	"path"
 	"path/filepath"
 	"strings"
@@ -87,12 +88,17 @@ func (t *Tools) readMap() error {
 }
 
 func dir() string {
+    /*
 	usr, _ := user.Current()
 	return path.Join(usr.HomeDir, ".arduino-create")
+    */
+    src, _ := osext.Executable()
+    dest := filepath.Dir(src)
+    return dest+"/tools"
 }
 
 // createDir creates the directory where the tools will be stored
 func createDir(directory string) {
 	os.Mkdir(directory, 0777)
-	hideFile(directory)
+	//hideFile(directory)
 }
